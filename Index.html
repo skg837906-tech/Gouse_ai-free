@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stream Player</title>
+  <!-- Load HLS.js for streaming video links (.m3u8) -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #e50914;
+    }
+    .input-container {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background-color: #1e1e1e;
+      color: #fff;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 20px;
+      background-color: #e50914;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #b20710;
+    }
+    video {
+      width: 100%;
+      max-width: 800px;
+      border-radius: 8px;
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Web Stream Player</h1>
+
+  <div class="input-container">
+    <input type="text" id="videoUrl" placeholder="Paste direct video or .m3u8 link here...">
+    <button onclick="playVideo()">Play</button>
+  </div>
+
+  <video id="videoPlayer" controls autoplay></video>
+
+  <script>
+    function playVideo() {
+      const url = document.getElementById('videoUrl').value.trim();
+      const video = document.getElementById('videoPlayer');
+
+      if (!url) {
+        alert('Please paste a video URL first!');
+        return;
+      }
+
+      // Check if the link is an HLS stream (.m3u8)
+      if (url.includes('.m3u8')) {
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(url);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            video.play();
+          });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = url;
+          video.play();
+        }
+      } else {
+        // Standard video link (.mp4, etc.)
+        video.src = url;
+        video.play();
+      }
+    }
+  </script>
+</body>
+</html>
